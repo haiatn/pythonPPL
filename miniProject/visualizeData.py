@@ -4,7 +4,7 @@ from numpy import linspace
 from scipy.stats.kde import gaussian_kde
 
 from bokeh.io import output_file, show
-from bokeh.models import ColumnDataSource, FixedTicker, PrintfTickFormatter
+from bokeh.models import ColumnDataSource, FixedTicker, PrintfTickFormatter, HoverTool
 from bokeh.plotting import figure
 from bokeh.sampledata.perceptions import probly
 
@@ -26,6 +26,13 @@ def getPopularityByGenre(genre):
 
 def getDates():
     return pd.date_range(start="2018-10-1", end="2019-10-31", freq='D').tolist()
+
+def getTooltipData(genre, date):
+    with sqlite3.connect("spotifyGraphDB.sqlite") as con:
+        con.row_factory=lambda cursor, row: row[0]
+        cur = con.cursor()
+        cur.execute("select * from dailyGenrePercents where genre = '"+genre+"' and date = '"+str(date)+"'")
+        return cur.fetchall()
 
 output_file("spotifyGraph.html")
 
@@ -50,6 +57,8 @@ for i, genre in enumerate(reversed(genres)):
     y = ridge(genre, getPopularityByGenre(genre))
     source = ColumnDataSource(data={'x': x, 'y': y})
     p.patch(x='x', y='y', color=palette[i], alpha=0.6, line_color="black", source=source)
+    p.add_tools(HoverTool(tooltips=[("slow tempo", "@tempoSlowPercent"), ("medium tempo", "@tempoMediumPercent"), ("fast tempo", "@tempoFactPercent")]))
+    # p.add_tools(HoverTool(tooltips=[("low energy", "@energyLowPercent"), ("high energy", "@energyHighPercent")]))
 
 p.outline_line_color = None
 p.background_fill_color = "#efefef"
