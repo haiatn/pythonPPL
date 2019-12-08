@@ -48,6 +48,8 @@ class ComplexNum:
 
     # 1.6 - calculate and return the result of adding to the complex number the other given value
     def __add__(self, other):
+        if type(other) != ComplexNum:
+            raise TypeError("Complex addition only defined for Complex Numbers")
         if type(other) == type(self):
             return ComplexNum(self.re + other.re, self.im + other.im)
 
@@ -57,7 +59,8 @@ class ComplexNum:
 
     # 1.7 - calculate and return the result of subtracting the complex number from the other given value
     def __sub__(self, other):
-        # I need to check other's type and follow accordingly (?)
+        if type(other) != ComplexNum:
+            raise TypeError("Complex subtracting only defined for Complex Numbers")
         return self.__add__(other.__neg__())
 
     # 1.8 - calculate and return the multiplication of two complex numbers
@@ -77,42 +80,52 @@ class ComplexNum:
         return math.sqrt(mul.re + mul.im)
 
 
-# 2.1 - return whether object1 is an instance of classInfo
+# 2.1 - return true if object1 is an instance of classInfo
 def isInstancePPL(object1,classInfo):
     return (type(classInfo) is type) and (type(object1) is not type) and (object1.__class__ is classInfo or classInfo in object1.__class__.__bases__)
 
 # 2.2 - return the number of hirarchy level between object1 class and classInfo
-def numInstancePPL(object1,classInfo):
-    #TODO
-    None
+def numInstancePPL(object1, classInfo):
+    parentClassList = list(object1.__class__.__bases__)
+    if parentClassList.__len__() == 0 or parentClassList[0] is object:
+        return 0
+    elif type(object1) is classInfo:
+        return 1
+    else:
+        # for base in parentClassList:
+            return 1 + numSubclassPPL(parentClassList[0], classInfo)
 
-# 2.3 - constructor for the complex number
+# 2.3 - return true if class1 inherits classInfo
 def isSubclassPPL(class1,classInfo):
-    return (type(classInfo) is type) and (type(class1) is type) and (classInfo in class1.__bases__ or class1==classInfo)
+    return (type(classInfo) is type) and (type(class1) is type) and (classInfo in class1.__bases__ or class1 == classInfo)
 
 # 2.4 - return the number of hirarchy level between class1 and classInfo
 def numSubclassPPL(class1,classInfo):
-    #TODO
-    None
-
+    parentClassList = list(class1.__bases__)
+    if class1 is classInfo:
+        return 1
+    elif parentClassList.__len__() == 0 or parentClassList[0] is object:
+        return 0
+    else:
+        # for base in parentClassList:
+            return 1 + numSubclassPPL(parentClassList[0], classInfo)
 
 # 3.1 - return number of object in list which statisfy func1 condition
-def count_if(lst,func):
-    return list(map(func,lst)).count(True)
+def count_if(lst, func):
+    return list(map(func, lst)).count(True)
 
 # 3.2 - return if the condition func2 is true for calculating func1 on each list item
-def for_all(lst,func1,func2):
-    # TODO
-    None
+def for_all(lst, func1, func2):
+    lstAfterFunc1 = list(map(func1, lst))
+    return count_if(lstAfterFunc1, func2) == lstAfterFunc1.__len__()
 
 # 3.3 - return if the condition func2 is true for calculating func1 on all list items
-def for_all_red(lst,func1,func2):
+def for_all_red(lst, func1, func2):
     return func2(reduce(func1,lst))
 
 # 3.4 - return if exists n items in the list who statisfy func1
-def there_exists(lst,n,func1):
-    # TODO
-    None
+def there_exists(lst, n, func1):
+    return count_if(lst, func1) >= n
 
 
 
@@ -126,7 +139,10 @@ def testQ1():
     print(z.conjugate()) # 1 - 2i
     print(-z) #-1 - 2i
     print(z.abs()) #sqrt(5)
-    print(z+2) # some kind of fail
+    try:
+        print(z+2) # some kind of fail
+    except TypeError:
+        print("ERROR!!!")
 
     z2 = ComplexNum(3, 1)
     print(z2.re) #3
@@ -135,8 +151,14 @@ def testQ1():
     print(z+z2) #4 + 3i
     print(z-z2) #-2 +1i
     #print(2-z2) #some kind of fail (we did not neede to actually implement)
-    print(z2-3) #some kind of fail
-    print(z2-3.0) #some kind of fail
+    try:
+        print(z2-3) #some kind of fail
+    except TypeError:
+        print("ERROR!!!")
+    try:
+        print(z2-3.0) #some kind of fail
+    except TypeError:
+        print("ERROR!!!")
     print(z.conjugate()+z2) #4 - 1i
     print(z2*z) #1 + 7i
     print((z2*z).abs()) # sqrt(50)
@@ -149,10 +171,11 @@ def testQ1():
     print(z2.__eq__(2.0)) #false
     print(ComplexNum(0,0)) # 0 + 0i
     print(type(z)==type(z2)) #true (we did not neede to actually implement, I just made sure
-    #print(z2*3) #raise error
+    try:
+        print(z2*3) #raise error
+    except TypeError:
+        print("ERROR!!!")
     #print(2*z2) #some kind of error (we did not neede to actually implement)
-
-
 
 def testQ2():
     class X:
@@ -167,15 +190,30 @@ def testQ2():
     print(isInstancePPL(y, X)) #True
     print(isInstancePPL(y, Y)) #True
 
-    print(numSubclassPPL(y, type(x)))  # 2
-    print(numSubclassPPL(y, Y))  # 1
-    print(numSubclassPPL(x, type(y)))  # 0 if im correct
+    # print(numSubclassPPL(y, type(x)))  # 2
+    # print(numSubclassPPL(y, Y))  # 1
+    # print(numSubclassPPL(x, type(y)))  # 0 if im correct
 
+    print(numInstancePPL(y,Y))
+    print(numInstancePPL(y,X))
     print(isSubclassPPL(x.__class__, X)) #True
+    print(isSubclassPPL(X, X)) # True
     print(isSubclassPPL(X, Y)) #False
     print(isSubclassPPL(Y, X)) #True
-    print(isSubclassPPL(Y, type(y))) #True
+    print(numSubclassPPL(Y, X))  # 2
+    # print(isSubclassPPL(Y, type(y))) #True
+    print(isSubclassPPL(Y, Y)) # True
+    print(numSubclassPPL(Y, Y))  # 1
 
+    print(isSubclassPPL(type(x), X)) # True
+    print(isSubclassPPL(type(x), Y)) # False
+    print(isSubclassPPL(type(y), X)) # True
+    print(isSubclassPPL(type(y), Y)) # True
+
+    print(isSubclassPPL(x.__class__, X)) # True
+    print(isSubclassPPL(x.__class__, Y)) # False
+    print(isSubclassPPL(y.__class__, X)) # True
+    print(isSubclassPPL(y.__class__, Y)) # True
 
     print(numSubclassPPL(Y,type(x))) #2
     print(numSubclassPPL(y.__class__, Y)) #1
@@ -188,18 +226,18 @@ def testQ2():
     print(isInstancePPL(z, X)) #True TODO
     print(isInstancePPL(z, Y)) #True
 
-    print(numInstancePPL(z,X))
-    print(numInstancePPL(x,Z))
+    print(numInstancePPL(z,X)) # 3
+    print(numInstancePPL(x,Z)) # 0
 
     print(isSubclassPPL(X, Z)) #False
     print(isSubclassPPL(Y, Z)) #False
     print(isSubclassPPL(Z, X)) #True TODO
 
-    print(numSubclassPPL(X,Z))
-    print(numSubclassPPL(Z, X))
+    print(numSubclassPPL(X,Z)) # 0
+    print(numSubclassPPL(Z, X)) # 3
 
 def testQ3():
-    print(count_if([1,0,8], lambda x: x > 2)) #1
+    print(count_if([1, 0, 8], lambda x: x > 2)) #1
     print(count_if([1, 1, 8], lambda x: x == 1))  # 2
 
     print(for_all([1, 0, 8], lambda x: x * 2, lambda x: x > 0))  # False
@@ -208,5 +246,10 @@ def testQ3():
     print(for_all_red([1, 0, 8], lambda x,y: x * y, lambda x: x > 0))  # False
     print(for_all_red([1, 1, 8], lambda x,y: x * y, lambda x: x > 7))  # True
 
-    print(there_exists([1,0,8],2,lambda x:x>-1)) #True if im correct
+    print(there_exists([1, 0, 8], 2, lambda x:x>-1)) #True
+    print(there_exists([1, 0, 8], 2, lambda x:x>5)) #False
+    print(there_exists([1, 0, 8], 2, lambda x:x>=1)) #True
+
+
+testQ2()
 
