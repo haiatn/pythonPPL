@@ -86,6 +86,10 @@ def isInstancePPL(object1,classInfo):
 
 # 2.2 - return the number of hirarchy level between object1 class and classInfo
 def numInstancePPL(object1, classInfo):
+    if type(object1) is type.__class__:
+        raise TypeError("first argument must be object")
+    if type.__class__ is not type(classInfo):
+        raise TypeError("second argument must be class")
     parentClassList = list(object1.__class__.__bases__)
     if parentClassList.__len__() == 0 or parentClassList[0] is object:
         return 0
@@ -101,6 +105,10 @@ def isSubclassPPL(class1,classInfo):
 
 # 2.4 - return the number of hirarchy level between class1 and classInfo
 def numSubclassPPL(class1,classInfo):
+    if type.__class__ is not type(class1):
+        raise TypeError("first argument must be class")
+    if type.__class__ is not type(classInfo):
+        raise TypeError("second argument must be class")
     parentClassList = list(class1.__bases__)
     if class1 is classInfo:
         return 1
@@ -235,6 +243,11 @@ def testQ2():
 
     print(numSubclassPPL(X,Z)) # 0
     print(numSubclassPPL(Z, X)) # 3
+
+    # print(numInstancePPL(Y, X)) # error
+    # print(numInstancePPL(y, x)) # error
+    # print(numSubclassPPL(x, Z)) # error
+    # print(numSubclassPPL(X, z)) # error
 
 def testQ3():
     print(count_if([1, 0, 8], lambda x: x > 2)) #1
