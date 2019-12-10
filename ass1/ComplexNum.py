@@ -113,7 +113,7 @@ def numInstancePPL(object1, classInfo):
                     minHirarchy = currHirarchy
                 else:
                     minHirarchy=min(minHirarchy, currHirarchy)
-        if minHirarchy == None:
+
             return 0
         else:
             return minHirarchy+1
@@ -152,7 +152,7 @@ def numSubclassPPL(class1,classInfo):
                     minHirarchy = currHirarchy
                 else:
                     minHirarchy = min(minHirarchy, currHirarchy)
-        if minHirarchy == None:
+        if minHirarchy == None: #nothing was found
             return 0
         else:
             return minHirarchy + 1
