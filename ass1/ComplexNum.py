@@ -163,23 +163,37 @@ def count_if(lst, func):
         raise TypeError("first argument must be list")
     if not callable(func):
         raise TypeError("second argument must be function")
-    if (type(lst) is not list) or not callable(func):
-        raise TypeError("the input was inserted incorrectly")
     return list(map(func, lst)).count(True)
 
 # 3.2 - return if the condition func2 is true for calculating func1 on each list item
 def for_all(lst, func1, func2):
+    if type(lst) is not list:
+        raise TypeError("first argument must be list")
+    if not callable(func1):
+        raise TypeError("second argument must be function")
+    if not callable(func2):
+        raise TypeError("second argument must be function")
     lstAfterFunc1 = list(map(func1, lst))
     return count_if(lstAfterFunc1, func2) == lstAfterFunc1.__len__()
 
 # 3.3 - return if the condition func2 is true for calculating func1 on all list items
 def for_all_red(lst, func1, func2):
-    if (type(lst) is not list) or (not callable(func1)) or (not callable(func2)):
-        raise TypeError("the input was inserted incorrectly")
+    if type(lst) is not list:
+        raise TypeError("first argument must be list")
+    if not callable(func1):
+        raise TypeError("second argument must be function")
+    if not callable(func2):
+        raise TypeError("second argument must be function")
     return func2(reduce(func1,lst))
 
 # 3.4 - return if exists n items in the list who statisfy func1
 def there_exists(lst, n, func1):
+    if type(lst) is not list:
+        raise TypeError("first argument must be list")
+    if type(n) is not int:
+        raise TypeError("second argument must be int")
+    if not callable(func1):
+        raise TypeError("third argument must be function")
     return count_if(lst, func1) >= n
 
 
@@ -338,10 +352,4 @@ def testQ3():
         print(count_if([1, 0, 8], "alina")) # error
     except TypeError:
         print("ERROR!!!")
-
-testQ1()
-print("****")
-testQ2()
-print("****")
-testQ3()
 
