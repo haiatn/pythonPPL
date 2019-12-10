@@ -82,8 +82,10 @@ class ComplexNum:
 
 # 2.1 - return true if object1 is an instance of classInfo
 def isInstancePPL(object1,classInfo):
-    if (type(object1) is type) or  (type(classInfo) is not type):
-        raise TypeError("the input was inserted incorrectly")
+    if type(object1) is type.__class__:
+        raise TypeError("first argument must be object")
+    if type.__class__ is not type(classInfo):
+        raise TypeError("second argument must be class")
     if type(object1) is classInfo:
         return True;
     for classFound in object1.__class__.__bases__:
@@ -108,8 +110,10 @@ def numInstancePPL(object1, classInfo):
 
 # 2.3 - return true if class1 inherits classInfo
 def isSubclassPPL(class1,classInfo):
-    if (type(class1) is not type) or  (type(classInfo) is not type):
-        raise TypeError("the input was inserted incorrectly")
+    if type.__class__ is not type(class1):
+        raise TypeError("first argument must be class")
+    if type.__class__ is not type(classInfo):
+        raise TypeError("second argument must be class")
     if class1 is classInfo:
         return True
     for classFound in class1.__bases__:
