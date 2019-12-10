@@ -172,7 +172,7 @@ def for_all(lst, func1, func2):
     if not callable(func1):
         raise TypeError("second argument must be function")
     if not callable(func2):
-        raise TypeError("second argument must be function")
+        raise TypeError("third argument must be function")
     lstAfterFunc1 = list(map(func1, lst))
     return count_if(lstAfterFunc1, func2) == lstAfterFunc1.__len__()
 
@@ -183,7 +183,7 @@ def for_all_red(lst, func1, func2):
     if not callable(func1):
         raise TypeError("second argument must be function")
     if not callable(func2):
-        raise TypeError("second argument must be function")
+        raise TypeError("third argument must be function")
     return func2(reduce(func1,lst))
 
 # 3.4 - return if exists n items in the list who statisfy func1
@@ -329,6 +329,7 @@ def testQ2():
         print(numSubclassPPL(X, z)) # error
     except TypeError:
         print("ERROR!!!")
+    print(numSubclassPPL(X, X)) # 1
 
 def testQ3():
     print(count_if([1, 0, 8], lambda x: x > 2)) #1
@@ -343,6 +344,10 @@ def testQ3():
     print(there_exists([1, 0, 8], 2, lambda x:x>-1)) #True
     print(there_exists([1, 0, 8], 2, lambda x:x>5)) #False
     print(there_exists([1, 0, 8], 2, lambda x:x>=1)) #True
+    try:
+        print(there_exists([1, 0, 8], "alina", lambda x:x>=1)) #error
+    except TypeError:
+        print("ERROR!!!")
 
     try:
         print(count_if("alina", lambda x: x > 2)) # error
