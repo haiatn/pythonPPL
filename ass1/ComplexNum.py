@@ -159,6 +159,10 @@ def numSubclassPPL(class1,classInfo):
 
 # 3.1 - return number of object in list which statisfy func1 condition
 def count_if(lst, func):
+    if type(lst) is not list:
+        raise TypeError("first argument must be list")
+    if not callable(func):
+        raise TypeError("second argument must be function")
     if (type(lst) is not list) or not callable(func):
         raise TypeError("the input was inserted incorrectly")
     return list(map(func, lst)).count(True)
@@ -295,10 +299,22 @@ def testQ2():
     print(numSubclassPPL(X,Z)) # 0
     print(numSubclassPPL(Z, X)) # 3
 
-    # print(numInstancePPL(Y, X)) # error
-    # print(numInstancePPL(y, x)) # error
-    # print(numSubclassPPL(x, Z)) # error
-    # print(numSubclassPPL(X, z)) # error
+    try:
+        print(numInstancePPL(Y, X)) # error
+    except TypeError:
+        print("ERROR!!!")
+    try:
+        print(numInstancePPL(y, x)) # error
+    except TypeError:
+        print("ERROR!!!")
+    try:
+        print(numSubclassPPL(x, Z)) # error
+    except TypeError:
+        print("ERROR!!!")
+    try:
+        print(numSubclassPPL(X, z)) # error
+    except TypeError:
+        print("ERROR!!!")
 
 def testQ3():
     print(count_if([1, 0, 8], lambda x: x > 2)) #1
@@ -313,6 +329,15 @@ def testQ3():
     print(there_exists([1, 0, 8], 2, lambda x:x>-1)) #True
     print(there_exists([1, 0, 8], 2, lambda x:x>5)) #False
     print(there_exists([1, 0, 8], 2, lambda x:x>=1)) #True
+
+    try:
+        print(count_if("alina", lambda x: x > 2)) # error
+    except TypeError:
+        print("ERROR!!!")
+    try:
+        print(count_if([1, 0, 8], "alina")) # error
+    except TypeError:
+        print("ERROR!!!")
 
 testQ1()
 print("****")
