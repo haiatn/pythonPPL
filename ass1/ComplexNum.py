@@ -100,13 +100,24 @@ def numInstancePPL(object1, classInfo):
     if type.__class__ is not type(classInfo):
         raise TypeError("second argument must be class")
     parentClassList = list(object1.__class__.__bases__)
-    if parentClassList.__len__() == 0 or parentClassList[0] is object:
+    if parentClassList.__len__() == 0:
         return 0
     elif type(object1) is classInfo:
         return 1
     else:
-        # for base in parentClassList:
-            return 1 + numSubclassPPL(parentClassList[0], classInfo)
+        minHirarchy = None #no hirarchy found
+        for baseClass in parentClassList:
+            currHirarchy = numSubclassPPL(baseClass, classInfo)
+            if currHirarchy > 0:
+                if minHirarchy == None:
+                    minHirarchy = currHirarchy
+                else:
+                    minHirarchy=min(minHirarchy, currHirarchy)
+        if minHirarchy == None:
+            return 0
+        else:
+            return minHirarchy+1
+
 
 # 2.3 - return true if class1 inherits classInfo
 def isSubclassPPL(class1,classInfo):
@@ -133,8 +144,18 @@ def numSubclassPPL(class1,classInfo):
     elif parentClassList.__len__() == 0 or parentClassList[0] is object:
         return 0
     else:
-        # for base in parentClassList:
-            return 1 + numSubclassPPL(parentClassList[0], classInfo)
+        minHirarchy = None  # no hirarchy found
+        for baseClass in parentClassList:
+            currHirarchy = numSubclassPPL(baseClass, classInfo)
+            if currHirarchy > 0:
+                if minHirarchy == None:
+                    minHirarchy = currHirarchy
+                else:
+                    minHirarchy = min(minHirarchy, currHirarchy)
+        if minHirarchy == None:
+            return 0
+        else:
+            return minHirarchy + 1
 
 # 3.1 - return number of object in list which statisfy func1 condition
 def count_if(lst, func):
