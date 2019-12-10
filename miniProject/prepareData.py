@@ -19,8 +19,8 @@ def getGenres():
         return cur.fetchall()
 
 def getDates():
-    # return pd.date_range(start="2018-10-1", end="2019-10-31", freq='D').tolist()
-    return pd.date_range(start="2019-10-1", end="2019-10-03", freq='D').tolist()
+    return pd.date_range(start="2018-10-1", end="2019-10-31", freq='D').tolist()
+    #return pd.date_range(start="2019-10-1", end="2019-10-03", freq='D').tolist()
 
 def getEneryDisc(energy):
     if energy > 0.6:
@@ -82,7 +82,7 @@ def calculatePercents(cur):
 
 
 #start main code
-data = spotifyChartsAPI.get_charts('2019-10-01', '2019-10-03', region='il')
+data = spotifyChartsAPI.get_charts('2018-10-01', '2019-10-31', region='il')
 print(list(data))
 
 with sqlite3.connect("spotifyGraphDB.sqlite") as con:

@@ -38,13 +38,13 @@ class ComplexNum:
 
     # 1.5 - return whether two objects are logically same
     def __eq__(self, other):
+        if type(other) != ComplexNum:
+            raise TypeError("equal check is only defined for Complex Numbers")
         if type(other) == type(self):
             if other.re == self.re and other.im == self.im:
                 return True
             else:
                 return False
-        else:
-            return False
 
     # 1.6 - calculate and return the result of adding to the complex number the other given value
     def __add__(self, other):
@@ -82,7 +82,14 @@ class ComplexNum:
 
 # 2.1 - return true if object1 is an instance of classInfo
 def isInstancePPL(object1,classInfo):
-    return (type(classInfo) is type) and (type(object1) is not type) and (object1.__class__ is classInfo or classInfo in object1.__class__.__bases__)
+    if (type(object1) is type) or  (type(classInfo) is not type):
+        raise TypeError("the input was inserted incorrectly")
+    if type(object1) is classInfo:
+        return True;
+    for classFound in object1.__class__.__bases__:
+        if isSubclassPPL(classFound,classInfo):
+            return True
+    return False
 
 # 2.2 - return the number of hirarchy level between object1 class and classInfo
 def numInstancePPL(object1, classInfo):
@@ -97,7 +104,14 @@ def numInstancePPL(object1, classInfo):
 
 # 2.3 - return true if class1 inherits classInfo
 def isSubclassPPL(class1,classInfo):
-    return (type(classInfo) is type) and (type(class1) is type) and (classInfo in class1.__bases__ or class1 == classInfo)
+    if (type(class1) is not type) or  (type(classInfo) is not type):
+        raise TypeError("the input was inserted incorrectly")
+    if class1 is classInfo:
+        return True
+    for classFound in class1.__bases__:
+        if isSubclassPPL(classFound,classInfo):
+            return True
+    return False
 
 # 2.4 - return the number of hirarchy level between class1 and classInfo
 def numSubclassPPL(class1,classInfo):
@@ -112,6 +126,8 @@ def numSubclassPPL(class1,classInfo):
 
 # 3.1 - return number of object in list which statisfy func1 condition
 def count_if(lst, func):
+    if (type(lst) is not list) or not callable(func):
+        raise TypeError("the input was inserted incorrectly")
     return list(map(func, lst)).count(True)
 
 # 3.2 - return if the condition func2 is true for calculating func1 on each list item
@@ -121,6 +137,8 @@ def for_all(lst, func1, func2):
 
 # 3.3 - return if the condition func2 is true for calculating func1 on all list items
 def for_all_red(lst, func1, func2):
+    if (type(lst) is not list) or (not callable(func1)) or (not callable(func2)):
+        raise TypeError("the input was inserted incorrectly")
     return func2(reduce(func1,lst))
 
 # 3.4 - return if exists n items in the list who statisfy func1
@@ -167,8 +185,16 @@ def testQ1():
     print(z==z2) #false
     print(z2==z) #false
     print((z-z)==(z2-z2)) #true
-    print(z2.__eq__(2)) #false
-    print(z2.__eq__(2.0)) #false
+    try:
+        print(z2.__eq__(2))  #some kind of fail
+    except TypeError:
+        print("ERROR!!!")
+    try:
+        print(z2.__eq__(2.0)) #some kind of fail
+    except TypeError:
+        print("ERROR!!!")
+
+
     print(ComplexNum(0,0)) # 0 + 0i
     print(type(z)==type(z2)) #true (we did not neede to actually implement, I just made sure
     try:
@@ -190,18 +216,18 @@ def testQ2():
     print(isInstancePPL(y, X)) #True
     print(isInstancePPL(y, Y)) #True
 
-    # print(numSubclassPPL(y, type(x)))  # 2
-    # print(numSubclassPPL(y, Y))  # 1
-    # print(numSubclassPPL(x, type(y)))  # 0 if im correct
+    print(numSubclassPPL(Y, type(x)))  # 2
+    print(numSubclassPPL(Y, Y))  # 1
+    print(numSubclassPPL(Y, type(y)))  # 1
 
-    print(numInstancePPL(y,Y))
-    print(numInstancePPL(y,X))
+    print(numInstancePPL(y,Y)) #1
+    print(numInstancePPL(y,X)) #2
     print(isSubclassPPL(x.__class__, X)) #True
     print(isSubclassPPL(X, X)) # True
     print(isSubclassPPL(X, Y)) #False
     print(isSubclassPPL(Y, X)) #True
     print(numSubclassPPL(Y, X))  # 2
-    # print(isSubclassPPL(Y, type(y))) #True
+    print(isSubclassPPL(Y, type(y))) #True
     print(isSubclassPPL(Y, Y)) # True
     print(numSubclassPPL(Y, Y))  # 1
 
@@ -223,7 +249,7 @@ def testQ2():
     z = Z()
     print(isInstancePPL(x, Z)) #False
     print(isInstancePPL(y, Z)) #False
-    print(isInstancePPL(z, X)) #True TODO
+    print(isInstancePPL(z, X)) #True
     print(isInstancePPL(z, Y)) #True
 
     print(numInstancePPL(z,X)) # 3
@@ -231,7 +257,7 @@ def testQ2():
 
     print(isSubclassPPL(X, Z)) #False
     print(isSubclassPPL(Y, Z)) #False
-    print(isSubclassPPL(Z, X)) #True TODO
+    print(isSubclassPPL(Z, X)) #True
 
     print(numSubclassPPL(X,Z)) # 0
     print(numSubclassPPL(Z, X)) # 3
@@ -250,6 +276,9 @@ def testQ3():
     print(there_exists([1, 0, 8], 2, lambda x:x>5)) #False
     print(there_exists([1, 0, 8], 2, lambda x:x>=1)) #True
 
-
+testQ1()
+print("****")
 testQ2()
+print("****")
+testQ3()
 
