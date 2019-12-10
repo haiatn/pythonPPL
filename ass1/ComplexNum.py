@@ -148,17 +148,33 @@ def count_if(lst, func):
 
 # 3.2 - return if the condition func2 is true for calculating func1 on each list item
 def for_all(lst, func1, func2):
+    if type(lst) is not list:
+        raise TypeError("first argument must be list")
+    if not callable(func1):
+        raise TypeError("second argument must be function")
+    if not callable(func2):
+        raise TypeError("third argument must be function")
     lstAfterFunc1 = list(map(func1, lst))
     return count_if(lstAfterFunc1, func2) == lstAfterFunc1.__len__()
 
 # 3.3 - return if the condition func2 is true for calculating func1 on all list items
 def for_all_red(lst, func1, func2):
-    if (type(lst) is not list) or (not callable(func1)) or (not callable(func2)):
-        raise TypeError("the input was inserted incorrectly")
+    if type(lst) is not list:
+        raise TypeError("first argument must be list")
+    if not callable(func1):
+        raise TypeError("second argument must be function")
+    if not callable(func2):
+        raise TypeError("third argument must be function")
     return func2(reduce(func1,lst))
 
 # 3.4 - return if exists n items in the list who statisfy func1
 def there_exists(lst, n, func1):
+    if type(lst) is not list:
+        raise TypeError("first argument must be list")
+    if type(n) is not int:
+        raise TypeError("second argument must be int")
+    if not callable(func1):
+        raise TypeError("third argument must be function")
     return count_if(lst, func1) >= n
 
 
@@ -294,6 +310,7 @@ def testQ2():
         print(numSubclassPPL(X, z)) # error
     except TypeError:
         print("ERROR!!!")
+    print(numSubclassPPL(X, X)) # 1
 
 def testQ3():
     print(count_if([1, 0, 8], lambda x: x > 2)) #1
@@ -308,6 +325,10 @@ def testQ3():
     print(there_exists([1, 0, 8], 2, lambda x:x>-1)) #True
     print(there_exists([1, 0, 8], 2, lambda x:x>5)) #False
     print(there_exists([1, 0, 8], 2, lambda x:x>=1)) #True
+    try:
+        print(there_exists([1, 0, 8], "alina", lambda x:x>=1)) #error
+    except TypeError:
+        print("ERROR!!!")
 
     try:
         print(count_if("alina", lambda x: x > 2)) # error
