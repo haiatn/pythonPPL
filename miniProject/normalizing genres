@@ -1,0 +1,20 @@
+UPDATE normalizedSongs
+SET genre="hip hop and rap"
+WHERE
+    genre Like '%rap%' or genre like '%hip%' or genre like '%r&b%' or genre like '%francoton%';
+UPDATE normalizedSongs
+SET genre="israeli"
+WHERE
+    genre Like '%israel%' or genre Like '%unknown%';
+UPDATE normalizedSongs
+SET genre="rock"
+WHERE
+    genre Like '%rock%';
+UPDATE normalizedSongs
+SET genre="pop"
+WHERE
+    genre Like '%pop%' or genre Like '%dance%' or genre="boy band";
+UPDATE normalizedSongs
+SET genre="electronic"
+WHERE
+    genre= "big room" or genre='edm' or genre='brostep';
