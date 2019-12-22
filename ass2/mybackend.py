@@ -26,7 +26,7 @@ class Database:
                          "Gender INT,"
                          "TripDurationinmin INT)")
         if countTableRows()[0] == 0:
-            with open('C:\\Users\\alina\\Documents\\semester 7\\Python\\BikeShare\\BikeShare.csv', 'rt') as fin:
+            with open('BikeShare.csv', 'rt') as fin:
                 dr = csv.DictReader(fin)
                 to_db = [(i['TripDuration'], i['StartTime'], i['StopTime'], i['StartStationID'], i['StartStationName'], i['StartStationLatitude'], i['StartStationLongitude'], i['EndStationID'], i['EndStationName'], i['EndStationLatitude'], i['EndStationLongitude'], i['BikeID'], i['UserType'], i['BirthYear'], i['Gender'], i['TripDurationinmin']) for i in dr]
             cur.executemany("INSERT INTO BikeShare (TripDuration, StartTime, StopTime, StartStationID, StartStationName, StartStationLatitude, StartStationLongitude, EndStationID, EndStationName, EndStationLatitude, EndStationLongitude, BikeID, UserType, BirthYear, Gender, TripDurationinmin)"
@@ -47,7 +47,7 @@ class Database:
 
 
 db = Database()
-print(db.getRecommendations("Hilltop", 6, 5))
+#print(db.getRecommendations("Hilltop", 6, 5))
 
 
 

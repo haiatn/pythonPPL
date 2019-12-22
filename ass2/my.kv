@@ -1,4 +1,7 @@
 <MyGrid>:
+	start:start
+	time:time
+	amount:amount
 	GridLayout:
 		cols:1
 		size: root.width, root.height
@@ -45,6 +48,7 @@
 				size_hint: (.2, None)
 				multiline:False
 				size: self.width,30
+				id:start
 				
 			Label:
 				text:""
@@ -61,6 +65,7 @@
 				size_hint: (.2, None)
 				multiline:False
 				size: self.width,30
+				id:time
 				
 			Label:
 				text:""
@@ -79,7 +84,7 @@
 				size_hint: (.2, None)
 				multiline:False
 				size: self.width,30
-				
+				id: amount
 			Label:
 				text:""
 				size: 100,self.height
@@ -95,6 +100,7 @@
 			
 			Button:
 				text:"Recommend Me"
+				on_press: root.recommaendMeFunc()
 				
 			Label:
 				text:""
