@@ -1,108 +1,137 @@
+
+<Label>:
+	font_size:20
+	halign: 'left'
+    valign: 'middle'
+	padding_x: 10
+<popUpC>:
+	recommendations:recommendations
+	Label:
+		text:"hi! our recommendations are"
+		id:recommendations
+		text_size: self.width, None
+		size_hint: 1, None
+		font_size:17
+		height: self.texture_size[1]
+		pos_hint:{"x":0,"top":1}
+		
+		width: 200,200
+	
 <MyGrid>:
+	canvas.before:
+		Rectangle:
+			pos: self.pos
+			size: self.size
+			source: 'grass.jpg'
+		
 	start:start
 	time:time
 	amount:amount
+	cols:1
+	size: root.size
+		
+	Label:
+		text: "Welcome To Our Bike Route App"
+		#color: 0, 0, 0, 1
+		size_hint_y: None
+		height: 100
+		font_size:50
+		background_color: 0,1,0,1
+		
+			
 	GridLayout:
-		cols:1
-		size: root.width, root.height
+		cols:2
+		
+		Image:
+			size_hint: (None, None)
+			source: 'bikes.jpg'
+			width:200
+			
+		
+		Label:
+			size_hint: (None, None)
+			text: "have some spare time? why don't you go biking? It is healthy and fun. Don't have much time? Don't know the place? DONT WORRY ABOUT IT"
+			text_size: self.size
+			width:400
+			
+		
+	GridLayout:
+		cols:4
+		
+		#second row
+		Label:
+			text:""
+			size: 100,self.height
+		
+		Label:
+			text:"what is your current location?"
+			text_size: self.size
+		
+		TextInput:
+			size_hint: (.2, None)
+			multiline:False
+			size: self.width,30
+			id:start
 			
 		Label:
-			text: "Welcome To Our Bike Route App"
-			size_hint: (None, None)
-			width: 700
-			height: 70
-				
+			text:""
+			size: 100,self.height
+		#third row
+		Label:
+			text:""
+			size: 100,self.height
+		
+		Label:
+			text:"how much time would you like to spend?"
+			text_size: self.size
+		TextInput:
+			size_hint: (.2, None)
+			multiline:False
+			size: self.width,30
+			id:time
 			
-		GridLayout:
-			cols:4
-			Label:
-				text: ""
-				size: 100,self.height
+		Label:
+			text:""
+			size: 100,self.height
+		
+		#fourth row
+		Label:
+			text:""
+			size: 100,self.height
+		
+		Label:
+			text:"how much location recommendations would you like to recieve?"
+			text_size: self.size
+		
+		TextInput:
+			size_hint: (.2, None)
+			multiline:False
+			size: self.width,30
+			id: amount
+		Label:
+			text:""
+			size: 100,self.height
+		
+		#fifth row
+		Label:
+			text:""
+			size: 100,self.height
+		
+		Button:
+			text:"Try example Value"
+			size_hint: None, None
+			size: 300, 50
+			on_release: root.exampleValueFunc()
 			
-			Image:
-				size_hint: (None, None)
-				source: 'bikes.jpg'
-				width: 200
-				height: 200
-				allow_stretch: True
-				
+		
+		Button:
+			text:"Recommend Me"
+			on_release: root.recommaendMeFunc()
+			size_hint: None, None
+			size: 300, 50
 			
-			Label:
-				text: "descriptionad asdsadsadsad as dasdas sa dsa dsa descriptionad"
-				text_size: self.size
 			
-			Label:
-				text:""
-				size: 100,self.height
-			
-			#second row
-			Label:
-				text:""
-				size: 100,self.height
-			
-			Label:
-				text:"what is your current location?"
-				text_size: self.size
-			
-			TextInput:
-				size_hint: (.2, None)
-				multiline:False
-				size: self.width,30
-				id:start
-				
-			Label:
-				text:""
-				size: 100,self.height
-			#third row
-			Label:
-				text:""
-				size: 100,self.height
-			
-			Label:
-				text:"how much time would you like to spend?"
-				text_size: self.size
-			TextInput:
-				size_hint: (.2, None)
-				multiline:False
-				size: self.width,30
-				id:time
-				
-			Label:
-				text:""
-				size: 100,self.height
-			
-			#fourth row
-			Label:
-				text:""
-				size: 100,self.height
-			
-			Label:
-				text:"how much location recommendations would you like to recieve?"
-				text_size: self.size
-			
-			TextInput:
-				size_hint: (.2, None)
-				multiline:False
-				size: self.width,30
-				id: amount
-			Label:
-				text:""
-				size: 100,self.height
-			
-			#fifth row
-			Label:
-				text:""
-				size: 100,self.height
-			
-			Button:
-				text:"try example value"
-				
-			
-			Button:
-				text:"Recommend Me"
-				on_press: root.recommaendMeFunc()
-				
-			Label:
-				text:""
-				size: 100,self.height
-			
+		Label:
+			text:""
+			size: 100,self.height
+		

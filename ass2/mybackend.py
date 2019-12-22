@@ -46,7 +46,7 @@ class Database:
         return res
 
 
-db = Database()
+#db = Database()
 #print(db.getRecommendations("Hilltop", 6, 5))
 
 
