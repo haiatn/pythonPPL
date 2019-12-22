@@ -1,0 +1,72 @@
+<MyGrid>:
+	GridLayout:
+		cols:1
+		size: root.width, root.height
+			
+		Label:
+			text: "Welcome To Our Bike Route App"
+			
+		GridLayout:
+			cols:4
+			
+			
+			Image:
+				source: 'bikes.jpg'
+				size: 50, 50
+			
+			Label:
+				text:"descriptionad asdsadsadsad as dasdas sa dsa dsa descriptionad"
+			
+			Label:
+				text:""
+				size: 100,self.height
+			
+			Label:
+				text:""
+				size: 100,self.height
+			
+			#second row
+			Label:
+				text:""
+				size: 100,self.height
+			
+			Label:
+				text:"what is your current location?"
+			
+			TextInput:
+				multiline:false
+				
+			Label:
+				text:""
+				size: 100,self.height
+			
+			#third row
+			Label:
+				text:""
+				size: 100,self.height
+			
+			Label:
+				text:"how much time would you like to spend?"
+			
+			TextInput:
+				multiline:false
+				
+			Label:
+				text:""
+				size: 100,self.height
+			
+			#fourth row
+			Label:
+				text:""
+				size: 100,self.height
+			
+			Label:
+				text:"how much location recommendations would you like to recieve?"
+			
+			TextInput:
+				multiline:false
+				
+			Label:
+				text:""
+				size: 100,self.height
+			
