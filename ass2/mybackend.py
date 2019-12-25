@@ -1,4 +1,6 @@
 import csv, sqlite3
+from datetime import datetime
+import math
 
 class Database:
     def __init__(self):
@@ -39,11 +41,61 @@ class Database:
         cur = conn.cursor()
         res = cur.execute("select * from BikeShare "
                           "where StartStationName like '" + currentLocation +
-                          "' and EndStationName like '" + currentLocation +
-                          "' and TripDurationinmin <= " + str(spendTime) +
-                          " limit " + str(numRecommendations)).fetchall()
+
+                          "' and TripDurationinmin <= " + str(spendTime)
+                          # "' and EndStationName like '" + currentLocation +
+                          #" limit " + str(numRecommendations)
+                          ).fetchall()
         conn.close()
-        return res
+        return self.orderByMostRecommended(res,self.ratingOption1,spendTime,numRecommendations);
+
+    def orderByMostRecommended(self,res,ratingFunc,spendTime,numRecommendations):
+        resultsWithRatings={}
+        for row in res:
+            resultsWithRatings[row[8]]=ratingFunc(row,spendTime)
+        return sorted(resultsWithRatings.items(), key=lambda item: item[1],reverse=True)[:int(numRecommendations)]
+
+    def ratingOption1(self, row,spendTime):
+        rowStartTime=row[1]
+        rowTripDurationinmin = int(row[15])
+        rowStartStationLatitude = row[5]
+        rowEndStationLatitude = row[9]
+        rowStartStationLongitude = row[6]
+        rowEndStationLongitude = row[10]
+
+        #each normalize create number in [0,1] where the highest is the best
+        rowHourInString=rowStartTime.split(" ")[1].split(":")[0]
+        deltaHour=abs(datetime.now().hour - int(rowHourInString))
+        normalizedDeltaHour= 1 - 2*(deltaHour/24)
+        deltaSpendTime= abs(rowTripDurationinmin-int(spendTime))
+        normalizedDeltaSpendTime=  4/(4+deltaSpendTime)
+        distance=math.sqrt( (rowStartStationLatitude-rowEndStationLatitude)**2 + (rowStartStationLongitude-rowEndStationLongitude)**2) #auclidian distnace
+        normalizedDistance=1/(1+distance)
+        return normalizedDeltaHour+normalizedDeltaSpendTime+normalizedDistance
+
+
+def checkUserInput(userStart, userTime, userAmount):
+    if userStart=="" or userStart==None:
+        return "you did not insert your starting point"
+    if userTime=="" or userTime==None:
+        return "you did not insert the time you want to spend"
+    if userAmount == "" or userAmount == None:
+        return "you did not insert the number of wanted location recommendations"
+    try:
+        userTime=int(userTime)
+    except ValueError:
+        return "please enter spending time in minutes by numbers only"
+    try:
+        userAmount=int(userAmount)
+    except ValueError:
+        return "please enter the number for location recommendation amount"
+
+    if(userTime<1):
+        return "we don't offer locations for this riding time"
+    if (userAmount < 1):
+        return "the number of locations is invalid"
+    return None
+
 
 
 #db = Database()

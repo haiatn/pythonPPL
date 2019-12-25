@@ -12,27 +12,7 @@ class popUpC(FloatLayout):
     recommendations = ObjectProperty(None)
 
 
-def checkUserInput(userStart, userTime, userAmount):
-    if userStart=="" or userStart==None:
-        return "you did not insert your starting point"
-    if userTime=="" or userTime==None:
-        return "you did not insert the time you want to spend"
-    if userAmount == "" or userAmount == None:
-        return "you did not insert the number of wanted location recommendations"
-    try:
-        userTime=int(userTime)
-    except ValueError:
-        return "please enter spending time in minutes by numbers only"
-    try:
-        userAmount=int(userAmount)
-    except ValueError:
-        return "please enter the number for location recommendation amount"
 
-    if(userTime<1):
-        return "we don't offer locations for this riding time"
-    if (userAmount < 1):
-        return "the number of locations is invalid"
-    return None
 class MyGrid(GridLayout):
     start = ObjectProperty(None)
     time = ObjectProperty(None)
@@ -43,19 +23,23 @@ class MyGrid(GridLayout):
         userStart=self.start.text
         userTime=self.time.text
         userAmount=self.amount.text
-        error=checkUserInput(userStart,userTime,userAmount)
+        self.start.text=""
+        self.time.text=""
+        self.amount.text=""
+        error=db.checkUserInput(userStart,userTime,userAmount)
         if error==None:
             resultList=currDB.getRecommendations(userStart,userTime, userAmount)
-            if len(resultList):
+            if len(resultList)==0:
                 popUpContent = popUpC()
                 popUpContent.recommendations.text = "we could not find in our database any results for you"
                 window = Popup(title="Error - No Results", content=popUpContent, size_hint=(None, None),
                                size=(500, 500))
                 window.open()
-            popUpContent = popUpC()
-            popUpContent.recommendations.text = str(resultList)
-            window = Popup(title="results", content=popUpContent, size_hint=(None, None), size=(500, 500))
-            window.open()
+            else:
+                popUpContent = popUpC()
+                popUpContent.recommendations.text = self.resultToText(resultList)
+                window = Popup(title="results", content=popUpContent, size_hint=(None, None), size=(500, 500))
+                window.open()
         else:
             popUpContent = popUpC()
             popUpContent.recommendations.text = error
@@ -68,6 +52,12 @@ class MyGrid(GridLayout):
         self.start.text="Oakland ave"
         self.time.text="5"
         self.amount.text="5"
+
+    def resultToText(self,resultList):
+        ans="hey, we have just the location for you, just choose:\n"
+        for result in resultList:
+            ans=ans+(result[0]+"  (score:"+str(result[1])[:4]+")\n")
+        return ans
 
 
 
