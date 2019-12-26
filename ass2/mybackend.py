@@ -2,7 +2,15 @@ import csv, sqlite3
 from datetime import datetime
 import math
 
+'''
+this class holds the business logic  of the application for biking route we built. 
+We get requests and analyze them. If the database isn't built yet it will be built 
+and then the Database object will calculate different routes by measurments we created.
+'''
 class Database:
+    '''
+    building the database on initialize if not already built
+    '''
     def __init__(self):
 
         def countTableRows():
@@ -35,7 +43,13 @@ class Database:
                             " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", to_db)
         conn.commit()
         conn.close()
-
+    '''
+    this function gets relevant records from the database and responsibleto get rankings and send results
+    :param currentLocation- the place the user starts at
+    :param spendTime- time in minutes to spend biking
+    :param numRecommendations- the number of results to choose from
+    :return  a list of tupples (destination location name, score in our rankings)
+    '''
     def getRecommendations(self, currentLocation, spendTime, numRecommendations):
         conn = sqlite3.connect('database.db')
         cur = conn.cursor()
@@ -48,13 +62,27 @@ class Database:
                           ).fetchall()
         conn.close()
         return self.orderByMostRecommended(res,self.ratingOption1,spendTime,numRecommendations);
-
+    '''
+    the function purpose is to add ratings and sort by it 
+    :param res- list of records to look at
+    :param ratingFunc- the function chosen for calculating rating
+    :param spendTime- the number in minutes the user want to bike (comes as string)
+    :param numRecommendations- the number of results the user wants (comes as string)
+    :return  a list of tupples (destination location name, score in our rankings)
+    '''
     def orderByMostRecommended(self,res,ratingFunc,spendTime,numRecommendations):
         resultsWithRatings={}
         for row in res:
             resultsWithRatings[row[8]]=ratingFunc(row,spendTime)
         return sorted(resultsWithRatings.items(), key=lambda item: item[1],reverse=True)[:int(numRecommendations)]
 
+    '''
+        add rate for one record. using the hour he searched (and database record's start hour),
+        distance in coordinates and similarity to time spending wanted. 
+        :param row- a possible location chosen
+        :param spendTime- the number of results the user wants
+        :return  rating in range [0,100]
+    '''
     def ratingOption1(self, row,spendTime):
         rowStartTime=row[1]
         rowTripDurationinmin = int(row[15])
@@ -71,9 +99,16 @@ class Database:
         normalizedDeltaSpendTime=  4/(4+deltaSpendTime)
         distance=math.sqrt( (rowStartStationLatitude-rowEndStationLatitude)**2 + (rowStartStationLongitude-rowEndStationLongitude)**2) #auclidian distnace
         normalizedDistance=1/(1+distance)
-        return normalizedDeltaHour+normalizedDeltaSpendTime+normalizedDistance
+        return (normalizedDeltaHour+normalizedDeltaSpendTime+normalizedDistance)*100/3 #to get score between 0 and 100
 
-
+'''
+this function is provided for all models who wants to use this backend so they 
+can alert users on wrong arguments.
+:param userStart- the location the user starts in
+:param userTime- the time the user wants to spend biking
+:param userAmount- the number of wanted results
+:return None if no errors else return error text that is informative to user.
+'''
 def checkUserInput(userStart, userTime, userAmount):
     if userStart=="" or userStart==None:
         return "you did not insert your starting point"

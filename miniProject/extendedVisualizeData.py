@@ -17,7 +17,7 @@ input:
 :param type-can be either "full" or "normalized". full means that we get all of the 
 genres and normalized are the genres we created that merge small genres into main genres.
 output:
-a list of genre names (as written in the database)
+:return a list of genre names (as written in the database)
 '''
 def getGenres(type):
     with sqlite3.connect("spotifyGraphDB.sqlite") as con:
@@ -32,7 +32,7 @@ def getGenres(type):
 
 '''
 output:
-a list that contains all of the dates that are in the databse. Because we limited the dates
+:return a list that contains all of the dates that are in the databse. Because we limited the dates
 prior to the program that dates are constants.
 '''
 def getDates():
@@ -44,7 +44,7 @@ input:
 and not the table 'normalizedSongs' which has the normalized data.
 :param genre- the genre in the database where we want the data from (should be normalized genre or not depends on the type)
 output:
-a list of numbers. each number is a popularity rank made out of the measurement we created for one day. It ordered so 
+:return a list of numbers. each number is a popularity rank made out of the measurement we created for one day. It ordered so 
 the first number is for the 1/10/18 and the last number is the genre popularity for 31/10/19.
 The rank is a meseaurment for popularity. Because we look the the 30 most popular songs everyday so we have rankings 
 from 1 to 30. because rank 1 is more valuable than rank 30 so we needed to invert the values and also to 
@@ -63,12 +63,12 @@ def getPopularityByGenre(genre, type):
 
 '''
 input:
-:param type- can be either "full" or "normalized". if the type is full then we need to fetch data from the table 'DailyGenrePercents'
+:param type - can be either "full" or "normalized". if the type is full then we need to fetch data from the table 'DailyGenrePercents'
 and not the table 'normalizedDailyGenrePercents' that has different calculations
 :param genre- the genre in the database where we want the data from (should be normalized genre or not depends on the type)
 :param title- that is the title of each number. if we look for 'energyLowPercent' that would be the title
 output:
-a list of numbers. It ordered so 
+:return a list of numbers. It ordered so 
 the first number is for the 1/10/18 and the last number is the genre popularity for 31/10/19.
 The number is the percents of this title in this genre for everyday in the time interval.
 '''
@@ -94,7 +94,7 @@ input:
 and not the table 'normalizedSongs' which has the normalized data.
 :param genre- the genre in the database where we want the data from (should be normalized genre or not depends on the type)
 output:
-a list of tuples. each tuple contains the genre inserted and its popularity for one day. It ordered so 
+:return a list of tuples. each tuple contains the genre inserted and its popularity for one day. It ordered so 
 the first tuple is for the 1/10/18 and the last tuple is the genre popularity for 31/10/19.
 note that this is the format needed for the graph. Note that we zeroed out the first and last days and that is because
 it makes the graphs more readable and intuitive for graphical reasons.
@@ -120,7 +120,7 @@ input:
 :param old- when the combo box changes the value before the search goes here
 :param new- when the combo box changes the value chosen after the search goes here
 output:
-it has no function output but it does change the GUI from normalized to full genres or the other way around.
+:return it has no function output but it does change the GUI from normalized to full genres or the other way around.
 '''
 def update_plot(attrName, old, new):
     if old == new:

@@ -21,7 +21,7 @@ sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
 input:
 :param table- the table to take genres from. Because we create two table we must specify if 'songs' or 'normalizedSongs'
 output:
-list of the string names of genres that in the table given
+:returns list of the string names of genres that in the table given
 '''
 def getGenres(table):
     with sqlite3.connect("spotifyGraphDB.sqlite") as con:
@@ -32,7 +32,7 @@ def getGenres(table):
 
 '''
 output:
-a list that contains all of the dates that are in the databse. Because we limited the dates
+:return a list that contains all of the dates that are in the databse. Because we limited the dates
 prior to the program that dates are constants.
 '''
 def getDates():
@@ -43,7 +43,7 @@ this function creates discretization of energy values. each value can be determi
 input:
 :param energy- values given on scale [0,1]
 ouput:
-the discrite value chosen for the input. if the number is higher than 0.6 then it is high, else it is low.
+:return the discrite value chosen for the input. if the number is higher than 0.6 then it is high, else it is low.
 '''
 def getEneryDisc(energy):
     if energy > 0.6:
@@ -56,7 +56,7 @@ this function creates discretization of tempo values. each value can be determin
 input:
 :param tempo- values which are bpm (beats per minute). mostly in range (40-150)
 ouput:
-the discrite value chosen for the input. the discretization conditions are decided after web research about
+:return the discrite value chosen for the input. the discretization conditions are decided after web research about
 music bpm count.
 '''
 def getTempoDisc(tempo):
@@ -73,10 +73,9 @@ input:
 :param cur- the connection to the database which we use. It should be connected from before
 :param row- the row is the object given from the API which will be analyzed
 ouput:
-the function does not return anything but it does insert to the 'songRate' table new values for one of the dates
+:return the function does not return anything but it does insert to the 'songRate' table new values for one of the dates
 and if the song is not yet inserted it also added to 'songs' table with all new information.
 '''
-
 def rowInsert(cur, row):
 
     #collecting relevant data for table
@@ -116,7 +115,7 @@ input:
 :param table- the table we do statistics on (song table so it can be 'songs' or 'normalizedSongs')
 :param destTable- a table which is used for keeping all the calculation results.
 ouput:
-the function does not return anything but it does insert to the the destTable the calculated informations
+:return the function does not return anything but it does insert to the the destTable the calculated informations
 '''
 def calculatePercents(cur,table,destTable):
     #creating table
@@ -146,7 +145,8 @@ def calculatePercents(cur,table,destTable):
                         "(select sum(energy)/"+sumEnergy+"*100 from "+table+" join songRate on "+table+".id = songRate.id where genre like '"+genre+"' and songRate.rateDate = '"+str(date)+"' and energyDisc like 'low'))", [genre, str(date)])
 
 
-#start main code. selecting dates, creating tables and collecting and saving to db data from APIs.
+#start main code. selecting dates, creating tables
+# and collecting and saving to db data from APIs.
 data = spotifyChartsAPI.get_charts('2018-10-01', '2019-10-31', region='il')
 with sqlite3.connect("spotifyGraphDB.sqlite") as con:
     cur = con.cursor()
