@@ -44,7 +44,7 @@ class Database:
         conn.commit()
         conn.close()
     '''
-    this function gets relevant records from the database and responsibleto get rankings and send results
+    this function gets relevant records from the database and responsible to get rankings and send results
     :param currentLocation- the place the user starts at
     :param spendTime- time in minutes to spend biking
     :param numRecommendations- the number of results to choose from
@@ -130,11 +130,4 @@ def checkUserInput(userStart, userTime, userAmount):
     if (userAmount < 1):
         return "the number of locations is invalid"
     return None
-
-
-
-#db = Database()
-#print(db.getRecommendations("Hilltop", 6, 5))
-
-
 

@@ -15,14 +15,11 @@
         </library>
       </libraries>
     </data-source>
-    <data-source source="LOCAL" name="spotifyGraphDB [2]" uuid="7ad1f79d-d8fe-41f1-90fc-ef9445ad5e3d">
+    <data-source source="LOCAL" name="database" uuid="70c6dead-3187-4a13-aa70-cb65b92ae2bb">
       <driver-ref>sqlite.xerial</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
-      <jdbc-url>jdbc:sqlite:C:\Users\high-net\PycharmProjects\pythonPPL\miniProject\spotifyGraphDB.sqlite</jdbc-url>
-      <driver-properties>
-        <property name="enable_load_extension" value="true" />
-      </driver-properties>
+      <jdbc-url>jdbc:sqlite:C:\Users\alina\PycharmProjects\pythonPPL\ass2\database.db</jdbc-url>
       <libraries>
         <library>
           <url>file://$APPLICATION_CONFIG_DIR$/jdbc-drivers/Xerial SQLiteJDBC/3.25.1/license.txt</url>
