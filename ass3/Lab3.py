@@ -53,16 +53,15 @@ def cleanTokens(tokens, stopWords):
 extract features of the given processed data before the classification (this function must be called after the original data proccesed)
 the extracted features are: tf*idf
 :param preprocessedData - the processed data (contains 3 columns, 1-Sentiment, 2-SentimentText, 3-tokenized SentimentText)
-:return 2 parameters, the first is 
+:return 3 parameters, the first is the training set as an array, the second is the array for each document in
+training set and the vectorizer for later use
 '''
 def featureExtractions(preprocessedData):
-    print("start feature extractions")
     corpus=[ " ".join(tokenList) for tokenList in preprocessedData['tokens']]
     Y=[ sentiment for sentiment in preprocessedData['Sentiment']]
-    vectorizer = TfidfVectorizer(max_features=1000, min_df=0.01)
+    vectorizer = TfidfVectorizer(max_features=50, min_df=0.001)
     X = vectorizer.fit_transform(corpus)
-    print("finished feature extractions")
-    return X.toarray(),Y
+    return X.toarray(),Y,vectorizer
 
 #TODO what is this function? we are not using it anywhere
 def createFileOfFrequantWords(preprocessedData):
@@ -93,15 +92,15 @@ def createClassifiers():
     models.append(("knn",KNeighborsClassifier()))
     models.append(("decision tree", DecisionTreeClassifier()))
     models.append(("naive bayes", GaussianNB()))
-    models.append(("SVM", SVC()))
+    models.append(("SVM", SVC(gamma="scale")))
     return models
 
-#TODO how do I define what is X and Y?
+
 '''
 evaluate the models in the given models list with the given X and Y data
 print the accurancy, precision, recall of each of the models
-:param X - 
-:param Y - 
+:param X - array of documents to be trained on
+:param Y - array of target classifications that matches X positions
 :param models - a list of models that will be evaluated
 '''
 def calculateModelsAccuracy(X,Y, models):
@@ -111,22 +110,24 @@ def calculateModelsAccuracy(X,Y, models):
         #crossValidition=model_selection.cross_val_score(model,X,Y,cv=10,scoring=["accuracy","precision","recall"])
         crossValidition=model_selection.cross_validate(model,X,Y,cv=10,scoring=["accuracy","precision","recall"])
         results.append(crossValidition)
-        print(name+": ",crossValidition["test_accuracy"],crossValidition["test_precision"],crossValidition["test_recall"])
+        print(name+": ",crossValidition["test_accuracy"].mean(),crossValidition["test_precision"].mean(),crossValidition["test_recall"].mean())
 
-#TODO X and Y???
 '''
 predict the given test data according to the given model
 finally print to a csv file which contains 2 columns, 
 the first is the ID of the tested row and the second is the predicted sentiment
 :param model - the chosen model for the prediction 
-:param X - 
-:param Y - 
-:param test - the test data to be predicted
+:param X - array of documents to be trained on
+:param Y - array of target classifications that matches X positions
+:param test - the test data to be predicted in the form the same as X
 '''
-def predictionsToTestFile(model,X,Y,test):
+def predictionsToTestFile(model,X,Y,vectorizer):
+        test = pd.read_csv(filePath, header=0, engine='python')
+        preprocessedData = preprocessing(test)
+        testVector=vectorizer.transform([ " ".join(tokenList) for tokenList in preprocessedData['tokens']]).toarray()
         model.fit(X,Y)
-        predictions=model.predict(test)
-        s=""
+        predictions=model.predict(testVector)
+        s="ID,SentimentText\n"
         for i in range(len(predictions)):
             s=s+str(i)+","+predictions[i]+"\n"
         with open("predictions.csv", "w") as f:
@@ -138,11 +139,10 @@ def predictionsToTestFile(model,X,Y,test):
 filePath = "Train.csv"
 data = pd.read_csv(filePath,header=0, engine='python')
 preprocessedData = preprocessing(data)
-X,Y = featureExtractions(preprocessedData)
-
+X,Y,vectorizer = featureExtractions(preprocessedData)
 models = createClassifiers()
 calculateModelsAccuracy(X,Y, models)
-#predictionsToTestFile(models[0],X,Y,test) #TODO fix to the right model selected
+predictionsToTestFile(models[0][1],X,Y,vectorizer)
 
 
 
