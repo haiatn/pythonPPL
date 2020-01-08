@@ -24,9 +24,7 @@ def preprocessing(data):
     data['tokens'] = data.apply(lambda row: word_tokenize(row['SentimentText'].lower()), axis=1)
     stopWords = set(stopwords.words('english'))
     stopWords.difference(["yes","no"])
-    stopWords.update(["...","'m","like","u","know","'re","'ll","one","'s",""])
-    # data['tokens'] = data.apply(lambda row : [w.replace('#', '') for w in row['tokens'] if
-    #                   not w in stopWords and not re.sub("@.", "", w) and not re.sub("/^\d+$/", "", w)], axis=1)
+    stopWords.update(["...","like","'m","u","know","'re","'ll","one","'s",""])
     data['tokens']=data.apply(lambda row: cleanTokens(row['tokens'], stopWords), axis=1)
     return data
 
@@ -38,17 +36,17 @@ clean the given tokens from stopwords, symbols and punctuation (like #, @)
 '''
 def cleanTokens(tokens, stopWords):
     intRegex = re.compile(r'(?:(?<=^)|(?<=\s))\d+(?=\s|$)')
-    tagRegex = re.compile(r'^@')
+    tagRegex = re.compile(r'^@.*')
+    myPunctuation=punctuation.replace('@', '')
     cleanTokens = [w.replace('#', '') for w in tokens if not w in stopWords and (
-        not intRegex.match(w)) and (not w in punctuation)]  # if  (not w in stopWords)  and (not re.sub("/^\d+$/", "", w))
+        not intRegex.match(w)) and (not w in myPunctuation)]
     tokensWithoutTags = []
     stemmer=PorterStemmer()
     for i in range(len(cleanTokens)):
-        if (not tagRegex.match(cleanTokens[i])) and (i != 0 and not tagRegex.match(cleanTokens[i - 1])):
+        if (i==0 and not tagRegex.match(cleanTokens[i])) or (i!= 0 and not tagRegex.match(cleanTokens[i - 1])):
             tokensWithoutTags.append(stemmer.stem(cleanTokens[i]))
     return tokensWithoutTags
 
-#TODO what the function returns???
 '''
 extract features of the given processed data before the classification (this function must be called after the original data proccesed)
 the extracted features are: tf*idf
@@ -59,30 +57,9 @@ training set and the vectorizer for later use
 def featureExtractions(preprocessedData):
     corpus=[ " ".join(tokenList) for tokenList in preprocessedData['tokens']]
     Y=[ sentiment for sentiment in preprocessedData['Sentiment']]
-    vectorizer = TfidfVectorizer(max_features=50, min_df=0.001)
+    vectorizer = TfidfVectorizer(max_features=200, min_df=0.001)
     X = vectorizer.fit_transform(corpus)
     return X.toarray(),Y,vectorizer
-
-#TODO what is this function? we are not using it anywhere
-def createFileOfFrequantWords(preprocessedData):
-    wordCounter = {0: {}, 1: {}}
-    data.apply(lambda row: addToCounter(row, wordCounter), axis=1)
-    wordCounter = {0: sorted(wordCounter[0].items(), key=lambda kv: -kv[1]),
-                   1: sorted(wordCounter[1].items(), key=lambda kv: -kv[1])}
-    s = ""
-    for i in range(100):
-        s = s + str(wordCounter[0][i][0]) + "," + str(wordCounter[0][i][1]) + "," + str(
-            wordCounter[1][i][0]) + "," + str(wordCounter[0][i][1]) + "\n"
-    with open("popularWords.csv", "w") as f:
-        f.write(s)
-
-#TODO also this one
-def addToCounter(row,wordCounter):
-    for token in row['tokens']:
-        if token not in wordCounter[row["Sentiment"]].keys():
-            wordCounter[row["Sentiment"]][token]=1
-        else:
-            wordCounter[row["Sentiment"]][token] = wordCounter[row["Sentiment"]][token]+1
 
 '''
 :return a list of models that we want to evaluate
@@ -107,7 +84,6 @@ def calculateModelsAccuracy(X,Y, models):
     results = []
     print("start training models")
     for name,model in models:
-        #crossValidition=model_selection.cross_val_score(model,X,Y,cv=10,scoring=["accuracy","precision","recall"])
         crossValidition=model_selection.cross_validate(model,X,Y,cv=10,scoring=["accuracy","precision","recall"])
         results.append(crossValidition)
         print(name+": ",crossValidition["test_accuracy"].mean(),crossValidition["test_precision"].mean(),crossValidition["test_recall"].mean())
@@ -121,20 +97,17 @@ the first is the ID of the tested row and the second is the predicted sentiment
 :param Y - array of target classifications that matches X positions
 :param test - the test data to be predicted in the form the same as X
 '''
-def predictionsToTestFile(model,X,Y,vectorizer):
-        test = pd.read_csv(filePath, header=0, engine='python')
+def predictionsToTestFile(model,X,Y,vectorizer,name):
+        test = pd.read_csv("Test.csv", header=0, engine='python')
         preprocessedData = preprocessing(test)
         testVector=vectorizer.transform([ " ".join(tokenList) for tokenList in preprocessedData['tokens']]).toarray()
         model.fit(X,Y)
         predictions=model.predict(testVector)
-        s="ID,SentimentText\n"
+        s="ID,Sentiment\n"
         for i in range(len(predictions)):
-            s=s+str(i)+","+predictions[i]+"\n"
-        with open("predictions.csv", "w") as f:
+            s=s+str(i)+","+str(predictions[i])+"\n"
+        with open("predictions"+name+".csv", "w") as f:
             f.write(s)
-
-
-
 
 filePath = "Train.csv"
 data = pd.read_csv(filePath,header=0, engine='python')
@@ -142,11 +115,5 @@ preprocessedData = preprocessing(data)
 X,Y,vectorizer = featureExtractions(preprocessedData)
 models = createClassifiers()
 calculateModelsAccuracy(X,Y, models)
-predictionsToTestFile(models[0][1],X,Y,vectorizer)
-
-
-
-
-
-
+predictionsToTestFile(models[3][1],X,Y,vectorizer,"predictions")
 
