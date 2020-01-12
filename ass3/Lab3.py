@@ -1,6 +1,5 @@
 import nltk
 import pandas as pd
-import numpy as np
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 from nltk.stem.porter import PorterStemmer
@@ -9,11 +8,8 @@ from string import punctuation
 from sklearn import model_selection
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.naive_bayes import GaussianNB
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.linear_model import LogisticRegression
-from sklearn.ensemble import GradientBoostingClassifier
 nltk.download('punkt')
 nltk.download('stopwords')
 '''
@@ -82,14 +78,9 @@ def featureExtractions(preprocessedData):
 '''
 def createClassifiers():
     models=[]
-    #models.append(("knn",KNeighborsClassifier()))
-    #models.append(("decision tree", DecisionTreeClassifier(min_samples_leaf=200)))
+    models.append(("decision tree", DecisionTreeClassifier(min_samples_leaf=200)))
     models.append(("logistic regression",LogisticRegression(random_state=0)))
-    #models.append(("logistic regression",LogisticRegression(random_state=0,penalty='elasticnet')))
-    #models.append(("logistic regression",LogisticRegression(random_state=0,penalty='none')))
-    #models.append(("gsboost",GradientBoostingClassifier()))
-    #models.append(("naive bayes", GaussianNB()))
-    #models.append(("SVM", SVC(gamma="scale")))
+    models.append(("naive bayes", GaussianNB()))
     return models
 
 
@@ -130,12 +121,9 @@ def predictionsToTestFile(model,X,Y,vectorizer,name):
             f.write(s)
 
 filePath = "Train.csv"
-data = pd.read_csv(filePath,header=0, engine='python')#.head(10000)
+data = pd.read_csv(filePath,header=0, engine='python')
 preprocessedData = preprocessing(data)
 X,Y,vectorizer = featureExtractions(preprocessedData)
 models = createClassifiers()
 calculateModelsAccuracy(X,Y, models)
-#predictionsToTestFile(models[0][1],X,Y,vectorizer,"regular")
 predictionsToTestFile(models[0][1],X,Y,vectorizer,"1")
-predictionsToTestFile(models[1][1],X,Y,vectorizer,"2")
-predictionsToTestFile(models[2][1],X,Y,vectorizer,"3")
