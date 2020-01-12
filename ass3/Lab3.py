@@ -12,7 +12,10 @@ from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
-
+from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import GradientBoostingClassifier
+nltk.download('punkt')
+nltk.download('stopwords')
 '''
 process the given data before the classification
 first of all tokenize the given data
@@ -23,9 +26,10 @@ then remove stop words, and clean the words
 def preprocessing(data):
     data['tokens'] = data.apply(lambda row: word_tokenize(row['SentimentText'].lower()), axis=1)
     stopWords = set(stopwords.words('english'))
-    stopWords.difference(["yes","no"])
+    stopWords.difference(["yes","no","not",'against'])
     stopWords.update(["...","like","'m","u","know","'re","'ll","one","'s",""])
     data['tokens']=data.apply(lambda row: cleanTokens(row['tokens'], stopWords), axis=1)
+    data['smileys']=data.apply(lambda row: findSmileys(row['SentimentText']), axis=1)
     return data
 
 '''
@@ -38,14 +42,24 @@ def cleanTokens(tokens, stopWords):
     intRegex = re.compile(r'(?:(?<=^)|(?<=\s))\d+(?=\s|$)')
     tagRegex = re.compile(r'^@.*')
     myPunctuation=punctuation.replace('@', '')
-    cleanTokens = [w.replace('#', '') for w in tokens if not w in stopWords and (
-        not intRegex.match(w)) and (not w in myPunctuation)]
+    cleanTokens = [w.replace('#', '') for w in tokens if not w in stopWords and (not intRegex.match(w)) and (not w in myPunctuation)]
     tokensWithoutTags = []
     stemmer=PorterStemmer()
     for i in range(len(cleanTokens)):
         if (i==0 and not tagRegex.match(cleanTokens[i])) or (i!= 0 and not tagRegex.match(cleanTokens[i - 1])):
             tokensWithoutTags.append(stemmer.stem(cleanTokens[i]))
     return tokensWithoutTags
+
+def findSmileys(text):
+  happySmiles=[":)","(:","(-:",":-)",";)","(;"]
+  sadSmiles=[":(","):",")-:",":-(",";(",");"]
+  for smile in happySmiles:
+    if smile in text:
+      return "happysmile"
+  for smile in sadSmiles:
+    if smile in text:
+      return "sadsmile"
+  return ""
 
 '''
 extract features of the given processed data before the classification (this function must be called after the original data proccesed)
@@ -55,21 +69,29 @@ the extracted features are: tf*idf
 training set and the vectorizer for later use
 '''
 def featureExtractions(preprocessedData):
-    corpus=[ " ".join(tokenList) for tokenList in preprocessedData['tokens']]
+    corpus=[  " ".join(row['tokens']) for record in preprocessedData['tokens']]
     Y=[ sentiment for sentiment in preprocessedData['Sentiment']]
-    vectorizer = TfidfVectorizer(max_features=200, min_df=0.001)
+    vectorizer = TfidfVectorizer(min_df=0.0005)
     X = vectorizer.fit_transform(corpus)
     return X.toarray(),Y,vectorizer
+
+def createRecord(row):
+    print(row)
+    return  " ".join(row['tokens'])+row['smileys']
 
 '''
 :return a list of models that we want to evaluate
 '''
 def createClassifiers():
     models=[]
-    models.append(("knn",KNeighborsClassifier()))
-    models.append(("decision tree", DecisionTreeClassifier()))
-    models.append(("naive bayes", GaussianNB()))
-    models.append(("SVM", SVC(gamma="scale")))
+    #models.append(("knn",KNeighborsClassifier()))
+    #models.append(("decision tree", DecisionTreeClassifier(min_samples_leaf=200)))
+    models.append(("logistic regression",LogisticRegression(random_state=0)))
+    #models.append(("logistic regression",LogisticRegression(random_state=0,penalty='elasticnet')))
+    #models.append(("logistic regression",LogisticRegression(random_state=0,penalty='none')))
+    #models.append(("gsboost",GradientBoostingClassifier()))
+    #models.append(("naive bayes", GaussianNB()))
+    #models.append(("SVM", SVC(gamma="scale")))
     return models
 
 
@@ -110,10 +132,12 @@ def predictionsToTestFile(model,X,Y,vectorizer,name):
             f.write(s)
 
 filePath = "Train.csv"
-data = pd.read_csv(filePath,header=0, engine='python')
+data = pd.read_csv(filePath,header=0, engine='python')#.head(10000)
 preprocessedData = preprocessing(data)
 X,Y,vectorizer = featureExtractions(preprocessedData)
 models = createClassifiers()
 calculateModelsAccuracy(X,Y, models)
-predictionsToTestFile(models[3][1],X,Y,vectorizer,"predictions")
-
+#predictionsToTestFile(models[0][1],X,Y,vectorizer,"regular")
+predictionsToTestFile(models[0][1],X,Y,vectorizer,"1")
+predictionsToTestFile(models[1][1],X,Y,vectorizer,"2")
+predictionsToTestFile(models[2][1],X,Y,vectorizer,"3")
