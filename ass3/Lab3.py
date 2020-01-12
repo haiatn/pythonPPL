@@ -71,7 +71,7 @@ the extracted features are: tf*idf
 training set and the vectorizer for later use
 '''
 def featureExtractions(preprocessedData):
-    corpus=[  " ".join(record) for record in preprocessedData[['tokens', 'smileys']]]
+    corpus=[  " ".join(record) for record in preprocessedData['tokens']]
     Y=[ sentiment for sentiment in preprocessedData['Sentiment']]
     vectorizer = TfidfVectorizer(min_df=0.0005)
     X = vectorizer.fit_transform(corpus)
