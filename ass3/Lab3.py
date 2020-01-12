@@ -30,6 +30,8 @@ def preprocessing(data):
     stopWords.update(["...","like","'m","u","know","'re","'ll","one","'s",""])
     data['tokens']=data.apply(lambda row: cleanTokens(row['tokens'], stopWords), axis=1)
     data['smileys']=data.apply(lambda row: findSmileys(row['SentimentText']), axis=1)
+    for index, row in data.iterrows():
+        row['tokens'].extend([row['smileys']])
     return data
 
 '''
@@ -51,7 +53,7 @@ def cleanTokens(tokens, stopWords):
     return tokensWithoutTags
 
 def findSmileys(text):
-  happySmiles=[":)","(:","(-:",":-)",";)","(;"]
+  happySmiles=[":)","(:","(-:",":-)",";)","(;", ":(p)"]
   sadSmiles=[":(","):",")-:",":-(",";(",");"]
   for smile in happySmiles:
     if smile in text:
@@ -69,15 +71,11 @@ the extracted features are: tf*idf
 training set and the vectorizer for later use
 '''
 def featureExtractions(preprocessedData):
-    corpus=[  " ".join(row['tokens']) for record in preprocessedData['tokens']]
+    corpus=[  " ".join(record) for record in preprocessedData[['tokens', 'smileys']]]
     Y=[ sentiment for sentiment in preprocessedData['Sentiment']]
     vectorizer = TfidfVectorizer(min_df=0.0005)
     X = vectorizer.fit_transform(corpus)
     return X.toarray(),Y,vectorizer
-
-def createRecord(row):
-    print(row)
-    return  " ".join(row['tokens'])+row['smileys']
 
 '''
 :return a list of models that we want to evaluate
